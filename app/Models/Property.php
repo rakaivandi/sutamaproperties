@@ -46,6 +46,22 @@ class Property extends Model
         return $this->hasOne(PropertyMedia::class)->where('is_cover', true);
     }
 
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    public function bookedDates(): array
+    {
+        return $this->bookings()
+            ->whereIn('status', ['confirmed','active'])
+            ->get(['start_date','end_date'])
+            ->map(fn($b) => [
+                'start' => $b->start_date->format('Y-m-d'),
+                'end'   => $b->end_date->format('Y-m-d'),
+            ])->toArray();
+    }
+
     public function scopeApproved($q)  { return $q->where('is_approved', true); }
     public function scopeAvailable($q) { return $q->whereIn('status', ['dijual','disewakan']); }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\Agen\AgenController;
 use App\Http\Controllers\Pembeli\PembeliController;
 use App\Http\Controllers\Agen\AgenPropertyController;
 use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\Pembeli\BookingController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -44,5 +45,15 @@ Route::middleware(['auth', 'role:pembeli'])->prefix('pembeli')->group(function (
 Route::get('/', [PropertyController::class, 'index'])->name('home');
 Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');
 Route::get('/properties/{property:slug}', [PropertyController::class, 'show'])->name('properties.show');
+
+Route::middleware(['auth', 'role:pembeli'])->prefix('pembeli')->name('pembeli.')->group(function () {
+    Route::get('/dashboard', [PembeliController::class, 'index'])->name('dashboard');
+
+    Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+    Route::get('/properties/{property}/book', [BookingController::class, 'create'])->name('bookings.create');
+    Route::post('/properties/{property}/book', [BookingController::class, 'store'])->name('bookings.store');
+});
 
 require __DIR__.'/auth.php';
