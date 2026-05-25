@@ -128,7 +128,12 @@
             <div class="space-y-3">
                 @if($booking->status === 'pending')
                     <button class="w-full py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition">
-                        💳 Bayar Sekarang — aktif di Phase E
+                        <a href="{{ route('pembeli.checkout', $booking) }}"
+       class="w-full block text-center py-3 bg-blue-600
+              text-white text-sm font-semibold rounded-xl
+              hover:bg-blue-700 transition">
+        Bayar Sekarang
+    </a>
                     </button>
                     <form method="POST" action="{{ route('pembeli.bookings.cancel', $booking) }}">
                         @csrf @method('PATCH')

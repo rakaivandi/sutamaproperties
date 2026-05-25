@@ -4,10 +4,12 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Agen\AgenController;
-use App\Http\Controllers\Pembeli\PembeliController;
 use App\Http\Controllers\Agen\AgenPropertyController;
 use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\Pembeli\PembeliController;
 use App\Http\Controllers\Pembeli\BookingController;
+use App\Http\Controllers\Pembeli\TransactionController;
+use App\Http\Controllers\WebhookController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -55,5 +57,25 @@ Route::middleware(['auth', 'role:pembeli'])->prefix('pembeli')->name('pembeli.')
     Route::get('/properties/{property}/book', [BookingController::class, 'create'])->name('bookings.create');
     Route::post('/properties/{property}/book', [BookingController::class, 'store'])->name('bookings.store');
 });
+
+Route::middleware(['auth', 'role:pembeli'])->prefix('pembeli')->name('pembeli.')->group(function () {
+    Route::get('/dashboard', [PembeliController::class, 'index'])->name('dashboard');
+
+    // Booking
+    Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+    Route::get('/properties/{property}/book', [BookingController::class, 'create'])->name('bookings.create');
+    Route::post('/properties/{property}/book', [BookingController::class, 'store'])->name('bookings.store');
+
+    // Payment
+    Route::get('/bookings/{booking}/checkout', [TransactionController::class, 'checkout'])->name('checkout');
+    Route::post('/bookings/{booking}/pay', [TransactionController::class, 'pay'])->name('pay');
+    Route::get('/payment/{transaction}', [TransactionController::class, 'payment'])->name('payment');
+    Route::get('/payment/{transaction}/success', [TransactionController::class, 'success'])->name('payment.success');
+});
+
+// Webhook — di luar grup
+Route::post('/webhook/midtrans', [WebhookController::class, 'midtrans'])->name('webhook.midtrans');
 
 require __DIR__.'/auth.php';
